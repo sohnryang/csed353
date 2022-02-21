@@ -1,4 +1,4 @@
-For build prereqs, see [the CS144 VM setup instructions](https://web.stanford.edu/class/cs144/vm_howto).
+For build prereqs, see [the VM setup instructions](http://tomahawk.postech.ac.kr/csed353/assignments/vm/virtualbox).
 
 ## Sponge quickstart
 
@@ -18,7 +18,7 @@ You can use the `-j` switch to build in parallel, e.g.,
 
     $ make -j$(nproc)
 
-To test (after building; make sure you've got the [build prereqs](https://web.stanford.edu/class/cs144/vm_howto) installed!)
+To test (after building; make sure you've got the [build prereqs](http://tomahawk.postech.ac.kr/csed353/assignments/vm/virtualbox) installed!)
 
     $ make check_labN *(replacing N with a checkpoint number)*
 

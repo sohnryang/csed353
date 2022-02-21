@@ -2,7 +2,7 @@
 
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "Sponge"
-PROJECT_BRIEF          = "CS144's user-space TCP library"
+PROJECT_BRIEF          = "CSED353's user-space TCP library"
 PROJECT_LOGO           = "@PROJECT_SOURCE_DIR@/etc/sponge_small.png"
 INPUT                  = @PROJECT_SOURCE_DIR@
 RECURSIVE              = YES
