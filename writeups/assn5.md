@@ -13,9 +13,7 @@ If you used any part of best-submission codes, specify all the best-submission n
 
 - **Caution**: If you have no idea about above best-submission item, please refer the Assignment PDF for detailed description.
 
-Your benchmark results (without reordering, with reordering): [0.00, 0.00]
-
-Program Structure and Design of the TCPConnection:
+Program Structure and Design of the NetworkInterface:
 []
 
 Implementation Challenges:
