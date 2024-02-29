@@ -11,6 +11,8 @@
 
 // You will need to add private members to the class declaration in `byte_stream.hh`
 
+using namespace std;
+
 ByteStream::ByteStream(const size_t capacity)
     : _input_eof(false)
     , _capacity(capacity)
@@ -30,7 +32,7 @@ size_t ByteStream::write(const std::string &data) {
 }
 
 //! \param[in] len bytes will be copied from the output side of the buffer
-std::string ByteStream::peek_output(const size_t len) const {
+string ByteStream::peek_output(const size_t len) const {
     if (len > _buffer_used)
         throw std::length_error("Tried to read more than capacity");
     std::string result;
