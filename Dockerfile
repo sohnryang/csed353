@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
   telnet \
   netcat \
   tmux \
+  clang-format \
   && rm -rf /var/lib/apt/lists/*
 
 CMD ["bash", "-l"]
