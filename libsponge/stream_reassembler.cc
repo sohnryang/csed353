@@ -49,10 +49,11 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
     if (_buffer[_cur] != -1) {
         std::string assembled_prefix;
         for (size_t i = 0; i < _buffer_used; i++) {
-            const int ch = _buffer[(_cur + i) % _capacity];
+            int &ch = _buffer[(_cur + i) % _capacity];
             if (ch == -1)
                 break;
             assembled_prefix += static_cast<char>(ch);
+            ch = -1;
         }
         _unassembled_start += assembled_prefix.length();
         _cur = (_cur + assembled_prefix.length()) % _capacity;
