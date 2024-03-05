@@ -54,7 +54,7 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
             int ch = _buffer[(_cur + i) % _capacity];
             if (ch == -1)
                 break;
-            assembled_prefix += ch;
+            assembled_prefix += static_cast<char>(ch);
         }
         _unassembled_start += assembled_prefix.length();
         _cur = (_cur + assembled_prefix.length()) % _capacity;
