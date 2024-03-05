@@ -61,7 +61,7 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
         _output.write(assembled_prefix);
     }
 
-    if (eof) {
+    if (eof && stream_data_end == stream_copy_end) {
         _is_finalizing = true;
         _stream_length = stream_copy_end;
     }
