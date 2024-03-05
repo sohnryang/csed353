@@ -32,6 +32,8 @@ size_t StreamReassembler::available_capacity() const { return _output.remaining_
 //! possibly out-of-order, from the logical stream, and assembles any newly
 //! contiguous substrings and writes them into the output stream in order.
 void StreamReassembler::push_substring(const string &data, const uint64_t index, const bool eof) {
+    if (index + data.length() <= _unassembled_start)
+        return;
     if (index + data.length() - _unassembled_start > available_capacity())
         return;
 
