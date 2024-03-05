@@ -36,14 +36,15 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
         return;
 
     for (size_t i = 0; i < data.length(); i++) {
-        size_t stream_index = index + i;
+        const size_t stream_index = index + i;
         if (stream_index < _unassembled_start)
             continue;
 
-        size_t unassembled_index = stream_index - _unassembled_start;
-        size_t buffer_index = (unassembled_index + _cur) % _capacity;
+        const size_t unassembled_index = stream_index - _unassembled_start;
+        const size_t buffer_index = (unassembled_index + _cur) % _capacity;
         if (_buffer[buffer_index] != -1)
             continue;
+
         _buffer[buffer_index] = data[i];
     }
     _buffer_used = std::max(static_cast<size_t>(index + data.length()), _buffer_used);
@@ -51,7 +52,7 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
     if (_buffer[_cur] != -1) {
         std::string assembled_prefix;
         for (size_t i = 0; i < _buffer_used; i++) {
-            int ch = _buffer[(_cur + i) % _capacity];
+            const int ch = _buffer[(_cur + i) % _capacity];
             if (ch == -1)
                 break;
             assembled_prefix += static_cast<char>(ch);
@@ -74,7 +75,7 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
 size_t StreamReassembler::unassembled_bytes() const {
     size_t result = 0;
     for (size_t i = 0; i < _buffer_used; i++) {
-        int ch = _buffer[(_cur + i) % _capacity];
+        const int ch = _buffer[(_cur + i) % _capacity];
         if (ch != -1)
             result++;
     }
