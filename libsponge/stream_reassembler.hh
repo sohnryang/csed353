@@ -19,6 +19,8 @@ class StreamReassembler {
     size_t _cur;                //!< Current position of reassembly buffer
     size_t _buffer_used;        //!< Size of reassembly buffer currently in use
     std::vector<int> _buffer;   //!< Buffer for reassembly
+    bool _is_finalizing;        //!< Flag indicating that the reassembler is in finalization phase
+    size_t _stream_length;      //!< Total length of the stream
 
     size_t available_capacity() const;
 

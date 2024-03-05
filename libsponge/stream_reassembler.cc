@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
-#include <stdexcept>
 
 // Dummy implementation of a stream reassembler.
 
@@ -18,7 +17,14 @@ void DUMMY_CODE(Targs &&.../* unused */) {}
 using namespace std;
 
 StreamReassembler::StreamReassembler(const size_t capacity)
-    : _output(capacity), _capacity(capacity), _unassembled_start(0), _cur(0), _buffer_used(0), _buffer(capacity, -1) {}
+    : _output(capacity)
+    , _capacity(capacity)
+    , _unassembled_start(0)
+    , _cur(0)
+    , _buffer_used(0)
+    , _buffer(capacity, -1)
+    , _is_finalizing(false)
+    , _stream_length(0) {}
 
 size_t StreamReassembler::available_capacity() const { return _output.remaining_capacity(); }
 
@@ -57,10 +63,12 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
     }
 
     if (eof) {
-        if (!empty())
-            throw logic_error("Tried to end incomplete output stream");
-        _output.end_input();
+        _is_finalizing = true;
+        _stream_length = index + data.length();
     }
+
+    if (_is_finalizing && _stream_length == _unassembled_start)
+        _output.end_input();
 }
 
 size_t StreamReassembler::unassembled_bytes() const {
