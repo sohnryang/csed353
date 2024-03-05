@@ -50,7 +50,7 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
 
         _buffer[buffer_index] = data[i];
     }
-    _buffer_used = std::max(sub_stream_end, _buffer_used);
+    _buffer_used = std::max(sub_stream_end - _unassembled_start, _buffer_used);
 
     if (_buffer[_cur] != -1) {
         std::string assembled_prefix;
