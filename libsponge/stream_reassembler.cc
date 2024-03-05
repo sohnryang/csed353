@@ -32,25 +32,19 @@ size_t StreamReassembler::available_capacity() const { return _output.remaining_
 //! possibly out-of-order, from the logical stream, and assembles any newly
 //! contiguous substrings and writes them into the output stream in order.
 void StreamReassembler::push_substring(const string &data, const uint64_t index, const bool eof) {
-    const size_t sub_stream_end = static_cast<size_t>(index + data.length());
-    if (sub_stream_end < _unassembled_start)
-        return;
-    if (sub_stream_end - _unassembled_start > available_capacity())
-        return;
-
-    for (size_t i = 0; i < data.length(); i++) {
-        const size_t stream_index = index + i;
-        if (stream_index < _unassembled_start)
-            continue;
-
+    const size_t stream_copy_start = std::max(static_cast<size_t>(index), _unassembled_start),
+                 stream_data_end = index + data.length(),
+                 stream_copy_end = std::min(stream_data_end, _unassembled_start + available_capacity());
+    for (size_t stream_index = stream_copy_start; stream_index < stream_copy_end; stream_index++) {
         const size_t unassembled_index = stream_index - _unassembled_start;
         const size_t buffer_index = (unassembled_index + _cur) % _capacity;
         if (_buffer[buffer_index] != -1)
             continue;
 
-        _buffer[buffer_index] = data[i];
+        _buffer[buffer_index] = data[stream_index - index];
     }
-    _buffer_used = std::max(sub_stream_end - _unassembled_start, _buffer_used);
+    if (stream_copy_end >= _unassembled_start)
+        _buffer_used = std::max(stream_copy_end - _unassembled_start, _buffer_used);
 
     if (_buffer[_cur] != -1) {
         std::string assembled_prefix;
@@ -68,7 +62,7 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
 
     if (eof) {
         _is_finalizing = true;
-        _stream_length = sub_stream_end;
+        _stream_length = stream_copy_end;
     }
 
     if (_is_finalizing && _stream_length == _unassembled_start)
