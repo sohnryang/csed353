@@ -22,6 +22,7 @@ class StreamReassembler {
     bool _is_finalizing;        //!< Flag indicating that the reassembler is in finalization phase
     size_t _stream_length;      //!< Total length of the stream
 
+    //! \brief Capacity available for `_buffer`, in bytes.
     size_t available_capacity() const;
 
   public:
