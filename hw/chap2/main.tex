@@ -1,0 +1,113 @@
+\documentclass{scrartcl}
+\usepackage[margin=3cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{blindtext}
+\usepackage{datetime}
+\usepackage{fontspec}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{kotex}
+\usepackage[lighttt]{lmodern}
+\usepackage{listings}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{pgf,tikz,pgfplots}
+
+\pgfplotsset{compat=1.15}
+\usetikzlibrary{arrows}
+\newtheorem{theorem}{Theorem}
+
+\lstset{
+  numbers=none, frame=single, showspaces=false,
+  showstringspaces=false, showtabs=false, breaklines=true, showlines=true,
+  breakatwhitespace=true, basicstyle=\ttfamily, keywordstyle=\bfseries, basewidth=0.5em
+}
+
+\setmainhangulfont{Noto Serif CJK KR}[
+  UprightFont=* Light, BoldFont=* Bold,
+  Script=Hangul, Language=Korean, AutoFakeSlant,
+]
+\setsanshangulfont{Noto Sans CJK KR}[
+  UprightFont=* DemiLight, BoldFont=* Medium,
+  Script=Hangul, Language=Korean
+]
+\setmathhangulfont{Noto Sans CJK KR}[
+  SizeFeatures={
+    {Size=-6,  Font=* Medium},
+    {Size=6-9, Font=*},
+    {Size=9-,  Font=* DemiLight},
+  },
+  Script=Hangul, Language=Korean
+]
+\title{CSED353: Chap. 2 Exercises (due Mar. 18)}
+\author{손량(20220323)}
+\date{Last compiled on: \today, \currenttime}
+
+\newcommand{\un}[1]{\ensuremath{\ \mathrm{#1}}}
+
+\begin{document}
+\maketitle
+
+\section{Problem \#1}
+
+\subsection{Solution for (a)}
+From the parameters given in the question, we can determine the parameters for
+internet access link as follows:
+\begin{align*}
+  L = 2,000,000 \un{bits/req} \quad
+  R = 54,000,000 \un{bps} \quad
+  a = 20 \un{req/s}
+\end{align*}
+Then, the utilization for access link is
+\begin{align*}
+  \rho = \frac{La}{R} = 0.741
+\end{align*}
+So the access link delay can be calculated as
+\begin{align*}
+  \frac{L}{R} \left( \frac{\rho}{1 - \rho} \right) + \frac{L}{R}
+  = 0.143 \un{s}
+\end{align*}
+For LAN, we can use \(R = 10,000,000,000 \un{bps}\) and obtain the LAN
+utilization of
+\begin{align*}
+  \rho = \frac{La}{R} = 0.004
+\end{align*}
+so the LAN delay can be calculated as
+\begin{align*}
+  \frac{L}{R} \left( \frac{\rho}{1 - \rho} \right) + \frac{L}{R}
+  = 0.000201 \un{s}
+\end{align*}
+Since the internet delay is given as 3 seconds, we obtain the final result as
+\begin{align*}
+  0.143 \un{s} + 3 \un{s} + 0.000201 \un{s} = 3.143 \un{s}
+\end{align*}
+
+\subsection{Solution for (b)}
+By taking cache into account, we can obtain utilization for access link as
+\begin{align*} 
+  \rho = 0.4 \times \frac{La}{R} = 0.296
+\end{align*}
+Assuming that round trip from and to the local web cache is negligible in the
+case of cache miss, the delay from the origin servers can be obtained as
+\begin{align*}
+  \frac{L}{R} \left( \frac{\rho}{1 - \rho} \right) + \frac{L}{R} + 3 \un{s}
+  = 3.05 \un{s}
+\end{align*}
+The utilization of LAN is
+\begin{align*}
+  \rho = 0.6 \times \frac{La}{R} = 0.0240
+\end{align*}
+Then the delay for cache server can be obtained as
+\begin{align*}
+  \frac{L}{R} \left( \frac{\rho}{1 - \rho} \right) + \frac{L}{R}
+  = 0.00205 \un{s}
+\end{align*}
+The final result is
+\begin{align*}
+  0.4 \times 3.05 \un{s} + 0.6 \times 0.00205 \un{s} = 1.22 \un{s}
+\end{align*}
+
+\end{document}
+% vim: textwidth=79
