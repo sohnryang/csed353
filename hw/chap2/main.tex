@@ -109,5 +109,76 @@ The final result is
   0.4 \times 3.05 \un{s} + 0.6 \times 0.00205 \un{s} = 1.22 \un{s}
 \end{align*}
 
+\section{Problem \#2}
+
+\section{Problem \#3}
+
+\subsection{Solution for (a)}
+Two packets were captured:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{prob3a}
+\end{figure}
+
+\subsection{Solution for (b)}
+One packet(the first one) was sent from the client to the server, and the
+another one(the second one) was sent from the server to the client. The client
+used port 57116 to communicate with the server.
+
+\begin{figure}[H]
+\begin{tabular}{|l|l|l|l|l|l|l|l|}
+\hline
+\begin{tabular}[c]{@{}l@{}}Packet\\ No.\end{tabular} & \begin{tabular}[c]{@{}l@{}}Src.\\ IP\end{tabular} & \begin{tabular}[c]{@{}l@{}}Src.\\ Port\end{tabular} & \begin{tabular}[c]{@{}l@{}}Dest.\\ IP\end{tabular} & \begin{tabular}[c]{@{}l@{}}Dest.\\ Port\end{tabular} & \begin{tabular}[c]{@{}l@{}}Data\\ Length\end{tabular} & Data & \begin{tabular}[c]{@{}l@{}}Text-converted\\ Data\end{tabular} \\ \hline
+N/A &  &  &  &  &  &  &  \\ \hline
+\multicolumn{8}{|c|}{bp1} \\ \hline
+1 & 127.0.0.1 & 60783 & 127.0.0.1 & 50001 & 11 & \texttt{68656c6c20776f726c6421} & \texttt{hell world!} \\ \hline
+\multicolumn{8}{|c|}{bp2} \\ \hline
+2 & 127.0.0.1 & 50001 & 127.0.0.1 & 60783 & 11 & \texttt{48454c4c20574f524c4421} & \texttt{HELL WORLD!} \\ \hline
+\end{tabular}
+\end{figure}
+
+\section{Problem \#4}
+
+\subsection{Solution for (a)}
+12 packets were captured:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{prob4a}
+\end{figure}
+
+Compared to the UDP exercise, 10 more packets were captured.
+
+\subsection{Solution for (b)}
+Six packets were sent from the client to the server, and the other six were
+from the server to the client. The client used port 60972 to communicate with
+the server.
+
+\begin{figure}[H]
+\begin{tabular}{|lllllllll|}
+\hline
+\multicolumn{1}{|l|}{\begin{tabular}[c]{@{}l@{}}Packet\\ No.\end{tabular}} & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Source\\ IP\end{tabular}} & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Source\\ Port\end{tabular}} & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Dest.\\ IP\end{tabular}} & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Dest.\\ Port\end{tabular}} & \multicolumn{1}{l|}{Flags} & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Data\\ Length\end{tabular}} & \multicolumn{1}{l|}{Data} & \begin{tabular}[c]{@{}l@{}}Text-converted\\ Data\end{tabular} \\ \hline
+\multicolumn{1}{|l|}{N/A} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} &  \\ \hline
+\multicolumn{9}{|c|}{bp1} \\ \hline
+\multicolumn{1}{|l|}{1} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{60792} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{50001} & \multicolumn{1}{l|}{SYN} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} &  \\ \hline
+\multicolumn{1}{|l|}{2} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{50001} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{60792} & \multicolumn{1}{l|}{SYN, ACK} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} &  \\ \hline
+\multicolumn{1}{|l|}{3} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{60792} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{50001} & \multicolumn{1}{l|}{ACK} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} &  \\ \hline
+\multicolumn{1}{|l|}{4} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{50001} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{60792} & \multicolumn{1}{l|}{ACK} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} &  \\ \hline
+\multicolumn{9}{|c|}{bp2} \\ \hline
+\multicolumn{1}{|l|}{5} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{60792} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{50001} & \multicolumn{1}{l|}{PSH, ACK} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{\texttt{6869}} & \texttt{hi} \\ \hline
+\multicolumn{1}{|l|}{6} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{50001} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{60792} & \multicolumn{1}{l|}{ACK} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} &  \\ \hline
+\multicolumn{9}{|c|}{bp3} \\ \hline
+\multicolumn{1}{|l|}{7} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{50001} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{60792} & \multicolumn{1}{l|}{PSH, ACK} & \multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{\texttt{4849}} & \texttt{HI} \\ \hline
+\multicolumn{1}{|l|}{8} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{60792} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{50001} & \multicolumn{1}{l|}{ACK} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} &  \\ \hline
+\multicolumn{9}{|c|}{bp4} \\ \hline
+\multicolumn{1}{|l|}{9} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{60972} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{50001} & \multicolumn{1}{l|}{FIN, ACK} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} &  \\ \hline
+\multicolumn{1}{|l|}{10} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{50001} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{60972} & \multicolumn{1}{l|}{ACK} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} &  \\ \hline
+\multicolumn{9}{|c|}{bp5} \\ \hline
+\multicolumn{1}{|l|}{11} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{50001} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{60792} & \multicolumn{1}{l|}{FIN, ACK} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} &  \\ \hline
+\multicolumn{1}{|l|}{12} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{60972} & \multicolumn{1}{l|}{127.0.0.1} & \multicolumn{1}{l|}{50001} & \multicolumn{1}{l|}{ACK} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{} &  \\ \hline
+\end{tabular}
+\end{figure}
+
 \end{document}
 % vim: textwidth=79
