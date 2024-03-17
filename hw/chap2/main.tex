@@ -111,6 +111,52 @@ The final result is
 
 \section{Problem \#2}
 
+\subsection{Solution for (a)}
+The numbers of fields in question are as follows:
+
+\begin{itemize}
+  \item Questions: 1
+  \item Answer RRs: 0
+  \item Authority RRs: 0
+  \item Additional RRs: 0
+\end{itemize}
+
+Question section has information about the query being made. There is one
+question field in the captured packet, which is a question asking for the
+address of \texttt{cse.postech.ac.kr}. Answer RRs are answers for given
+question. RR is an acronym for ``request record''. Since this packet is a
+packet sent from the client to the server, there is no data for this section.
+Authority RRs contains records for other authoritative servers, and additional
+RRs has other helpful records. Like answer RRs, these fields typically contin
+answers from DNS servers, so there is no data for these sections as well.
+
+\subsection{Solution for (b)}
+\begin{figure}[H]
+\centering
+\begin{tabular}{|l|lllll|}
+\hline
+ & \multicolumn{1}{l|}{Name} & \multicolumn{1}{l|}{Type} & \multicolumn{1}{l|}{Address} & \multicolumn{1}{l|}{Name server} & Time to live \\ \hline
+Answers & \multicolumn{1}{l|}{cse.postech.ac.kr} & \multicolumn{1}{l|}{A} & \multicolumn{1}{l|}{141.223.5.78} & \multicolumn{1}{l|}{} & 172800 \\ \hline
+\begin{tabular}[c]{@{}l@{}}Authoritative\\ nameservers\end{tabular} & \multicolumn{5}{c|}{N/A} \\ \hline
+\begin{tabular}[c]{@{}l@{}}Additional\\ records\end{tabular} & \multicolumn{5}{c|}{N/A} \\ \hline
+\end{tabular}
+\end{figure}
+
+\subsection{Solution for (c)}
+No authoritative servers were listed in the captured packet.
+
+\subsection{Solution for (d)}
+SOA record is a record which has administrative information about the zone.
+
+\subsection{Solution for (e)}
+The response packet contains this RR because we queried nonexistent domain.
+Since there is no address corresponding to the domain, the DNS system instead
+responds with information about the zone corresponding to \texttt{ac.kr}. In
+our situation, we deliberately picked such domain so the provided information
+in SOA record is of no use. However, if we are really wanting the address for
+this domain and there was none found, the information in the record might be
+useful for troubleshooting and debugging.
+
 \section{Problem \#3}
 
 \subsection{Solution for (a)}
