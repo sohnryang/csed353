@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
   netcat \
   tmux \
   clang-format-6.0 \
+  libpcap-dev \
   && rm -rf /var/lib/apt/lists/*
 
 CMD ["bash", "-l"]
