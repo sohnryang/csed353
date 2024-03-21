@@ -2,6 +2,8 @@
 
 #include "wrapping_integers.hh"
 
+#include <optional>
+
 // Dummy implementation of a TCP receiver
 
 // For Lab 2, please replace with a real implementation that passes the
@@ -29,7 +31,7 @@ optional<WrappingInt32> TCPReceiver::ackno() const {
         return _isn.value() + _reassembler.stream_out().bytes_written() + 1 +
                static_cast<uint32_t>(_reassembler.empty() && _fin_received);
     else
-        return {};
+        return std::nullopt;
 }
 
 size_t TCPReceiver::window_size() const { return _reassembler.stream_out().remaining_capacity(); }
