@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 
 // Dummy implementation of a stream reassembler.
 
@@ -19,7 +20,7 @@ StreamReassembler::StreamReassembler(const size_t capacity)
     , _unassembled_start(0)
     , _cur(0)
     , _buffer_used(0)
-    , _buffer(capacity, -1)
+    , _buffer(capacity, std::nullopt)
     , _is_finalizing(false)
     , _stream_length(0) {}
 
@@ -35,7 +36,7 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
     for (size_t stream_index = stream_copy_start; stream_index < stream_copy_end; stream_index++) {
         const size_t unassembled_index = stream_index - _unassembled_start;
         const size_t buffer_index = (unassembled_index + _cur) % _capacity;
-        if (_buffer[buffer_index] != -1)
+        if (_buffer[buffer_index].has_value())
             continue;
 
         _buffer[buffer_index] = data[stream_index - index];
@@ -43,14 +44,14 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
     if (stream_copy_end >= _unassembled_start)
         _buffer_used = max(stream_copy_end - _unassembled_start, _buffer_used);
 
-    if (_buffer[_cur] != -1) {
+    if (_buffer[_cur].has_value()) {
         string assembled_prefix;
         for (size_t i = 0; i < _buffer_used; i++) {
-            int &ch = _buffer[(_cur + i) % _capacity];
-            if (ch == -1)
+            auto &ch = _buffer[(_cur + i) % _capacity];
+            if (!ch.has_value())
                 break;
-            assembled_prefix += static_cast<char>(ch);
-            ch = -1;
+            assembled_prefix += ch.value();
+            ch.reset();
         }
         _unassembled_start += assembled_prefix.length();
         _cur = (_cur + assembled_prefix.length()) % _capacity;
@@ -70,8 +71,8 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
 size_t StreamReassembler::unassembled_bytes() const {
     size_t result = 0;
     for (size_t i = 0; i < _buffer_used; i++) {
-        const int ch = _buffer[(_cur + i) % _capacity];
-        if (ch != -1)
+        const auto &ch = _buffer[(_cur + i) % _capacity];
+        if (ch.has_value())
             result++;
     }
     return result;
