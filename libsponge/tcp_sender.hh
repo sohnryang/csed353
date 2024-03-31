@@ -11,6 +11,7 @@
 #include <list>
 #include <optional>
 #include <queue>
+#include <vector>
 
 class RetransmissionTimer {
   private:
@@ -68,8 +69,17 @@ class TCPSender {
     //! checkpoint of receiver's absolute sequence number
     uint64_t _checkpoint{0};
 
+    //! the retransmission timer
+    RetransmissionTimer _timer;
+
     //! push a segment to the queue
     void push_segment(const TCPSegment &segment);
+
+    //! return a vector of splitted segments
+    std::vector<TCPSegment> split_to_fit(const TCPSegment &segment);
+
+    //! retransmission counter
+    unsigned int _retransmission_count{0};
 
   public:
     //! Initialize a TCPSender

@@ -10,7 +10,9 @@
 #include <numeric>
 #include <optional>
 #include <random>
+#include <stdexcept>
 #include <utility>
+#include <vector>
 
 // Dummy implementation of a TCP sender
 
@@ -46,7 +48,15 @@ void TCPSender::push_segment(const TCPSegment &segment) {
     if (segment_len > 0) {
         _outstanding_segments.push_back({_next_seqno, segment});
         _next_seqno += segment.length_in_sequence_space();
+        _timer.start();
     }
+}
+
+vector<TCPSegment> TCPSender::split_to_fit(const TCPSegment &segment) {
+    // TODO: replace with proper implementation
+    if (segment.length_in_sequence_space() > _window_size)
+        throw runtime_error("Not implemented yet");
+    return {segment};
 }
 
 //! \param[in] capacity the capacity of the outgoing byte stream
@@ -56,7 +66,8 @@ TCPSender::TCPSender(const size_t capacity, const uint16_t retx_timeout, const s
     : _isn(fixed_isn.value_or(WrappingInt32{random_device()()}))
     , _initial_retransmission_timeout{retx_timeout}
     , _stream(capacity)
-    , _outstanding_segments() {}
+    , _outstanding_segments()
+    , _timer(_initial_retransmission_timeout) {}
 
 size_t TCPSender::bytes_in_flight() const {
     return accumulate(_outstanding_segments.begin(), _outstanding_segments.end(), 0, [](size_t sum, const auto &p) {
@@ -113,14 +124,49 @@ void TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_si
         [absolute_ackno](const auto &p) { return p.first + p.second.length_in_sequence_space() > absolute_ackno; });
     _outstanding_segments = std::move(new_outstanding);
 
+    if (_outstanding_segments.empty())
+        _timer.stop();
+
+    if (absolute_ackno > _checkpoint) {
+        _timer.timeout() = _initial_retransmission_timeout;
+        if (!_outstanding_segments.empty()) {
+            _timer.stop();
+            _timer.start();
+        }
+        _retransmission_count = 0;
+    }
+
     _window_size = window_size;
     _checkpoint = absolute_ackno;
 }
 
 //! \param[in] ms_since_last_tick the number of milliseconds since the last call to this method
-void TCPSender::tick(const size_t ms_since_last_tick) { DUMMY_CODE(ms_since_last_tick); }
+void TCPSender::tick(const size_t ms_since_last_tick) {
+    _timer.tick(ms_since_last_tick);
+    if (_timer.is_expired()) {
+        if (_outstanding_segments.empty())
+            throw logic_error("Expected at least one outstanding segment");
 
-unsigned int TCPSender::consecutive_retransmissions() const { return {}; }
+        const auto it = min_element(_outstanding_segments.cbegin(),
+                                    _outstanding_segments.cend(),
+                                    [](const auto &p1, const auto &p2) { return p1.first < p2.first; });
+
+        const auto splitted_segments = split_to_fit(it->second);
+
+        for (auto &segment : splitted_segments)
+            _segments_out.emplace(std::move(segment));
+
+        if (_window_size != 0) {
+            _timer.timeout() *= 2;
+            _retransmission_count++;
+        }
+
+        _timer.stop();
+        _timer.start();
+    }
+}
+
+unsigned int TCPSender::consecutive_retransmissions() const { return _retransmission_count; }
 
 void TCPSender::send_empty_segment() {
     TCPSegment segment;
