@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <iterator>
 #include <list>
@@ -54,8 +55,10 @@ void TCPSender::push_segment(const TCPSegment &segment) {
 }
 
 vector<TCPSegment> TCPSender::split_to_fit(const TCPSegment &segment) {
+    const auto normalized_window_size = max(_window_size, uint16_t{1});
+
     // TODO: replace with proper implementation
-    if (segment.length_in_sequence_space() > _window_size)
+    if (segment.length_in_sequence_space() > normalized_window_size)
         throw runtime_error("Not implemented yet");
     return {segment};
 }
