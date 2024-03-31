@@ -24,8 +24,12 @@ using namespace std;
 
 void TCPSender::push_segment(const TCPSegment &segment) {
     _segments_out.push(segment);
-    _outstanding_segments.push_back({_next_seqno, segment});
-    _next_seqno += segment.length_in_sequence_space();
+
+    const auto segment_len = segment.length_in_sequence_space();
+    if (segment_len > 0) {
+        _outstanding_segments.push_back({_next_seqno, segment});
+        _next_seqno += segment.length_in_sequence_space();
+    }
 }
 
 //! \param[in] capacity the capacity of the outgoing byte stream
@@ -96,4 +100,8 @@ void TCPSender::tick(const size_t ms_since_last_tick) { DUMMY_CODE(ms_since_last
 
 unsigned int TCPSender::consecutive_retransmissions() const { return {}; }
 
-void TCPSender::send_empty_segment() {}
+void TCPSender::send_empty_segment() {
+    TCPSegment segment;
+    segment.header().seqno = _isn + _next_seqno;
+    push_segment(segment);
+}
