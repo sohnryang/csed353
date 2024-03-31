@@ -34,8 +34,6 @@ class RetransmissionTimer {
     void stop();
 
     bool is_running() const { return _is_running; }
-
-    void reset();
 };
 
 //! \brief The "sender" part of a TCP implementation.

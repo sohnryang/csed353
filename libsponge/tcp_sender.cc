@@ -34,9 +34,10 @@ bool RetransmissionTimer::is_expired() const { return _elapsed >= _timeout; }
 
 void RetransmissionTimer::start() { _is_running = true; }
 
-void RetransmissionTimer::stop() { _is_running = false; }
-
-void RetransmissionTimer::reset() { _elapsed = 0; }
+void RetransmissionTimer::stop() {
+    _elapsed = 0;
+    _is_running = false;
+}
 
 void TCPSender::push_segment(const TCPSegment &segment) {
     _segments_out.push(segment);
