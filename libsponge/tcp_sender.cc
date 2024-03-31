@@ -110,6 +110,8 @@ void TCPSender::fill_window() {
 //! \param window_size The remote receiver's advertised window size
 void TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_size) {
     const auto absolute_ackno = unwrap(ackno, _isn, _checkpoint);
+    if (absolute_ackno > _next_seqno)
+        return;
 
     std::list<std::pair<uint64_t, TCPSegment>> new_outstanding;
     std::copy_if(
