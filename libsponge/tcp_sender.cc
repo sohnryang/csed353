@@ -76,39 +76,34 @@ size_t TCPSender::bytes_in_flight() const {
 }
 
 void TCPSender::fill_window() {
-    if (_stream.buffer_empty() && _next_seqno != 0)
+    if (_stream.eof() && _fin_sent)
         return;
 
     const auto syn = _next_seqno == 0;
     const auto normalized_window_size = static_cast<size_t>(max(_window_size, uint16_t{1}));
     if (normalized_window_size <= bytes_in_flight())
         return;
-    const auto available_window_size = normalized_window_size - bytes_in_flight();
 
-    const auto read_size = min(_stream.buffer_size(), available_window_size - (syn ? 1 : 0));
-    auto payload = _stream.read(read_size);
+    const auto available_window_size = normalized_window_size - bytes_in_flight();
+    if (available_window_size == 0)
+        return;
 
     TCPSegment segment;
-    segment.payload() = std::move(payload);
-    segment.header().syn = syn;
     segment.header().seqno = _isn + _next_seqno;
-
-    if (!_stream.eof()) {
+    segment.header().syn = syn;
+    if (segment.length_in_sequence_space() == available_window_size) {
         push_segment(segment);
         return;
     }
 
-    if (segment.length_in_sequence_space() < _window_size) {
-        segment.header().fin = true;
-        push_segment(segment);
-    } else {
-        push_segment(segment);
+    const auto read_size = min(_stream.buffer_size(), available_window_size - segment.length_in_sequence_space());
+    segment.payload() = _stream.read(read_size);
 
-        TCPSegment fin_segment;
-        fin_segment.header().fin = true;
-        fin_segment.header().seqno = _isn + _next_seqno;
-        push_segment(fin_segment);
-    }
+    segment.header().fin = _stream.eof() && available_window_size > segment.length_in_sequence_space();
+    _fin_sent = segment.header().fin;
+
+    if (segment.length_in_sequence_space() > 0)
+        push_segment(segment);
 }
 
 //! \param ackno The remote receiver's ackno (acknowledgment number)

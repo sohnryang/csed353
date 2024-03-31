@@ -81,6 +81,9 @@ class TCPSender {
     //! retransmission counter
     unsigned int _retransmission_count{0};
 
+    //! flag indicating whether fin was sent
+    bool _fin_sent{false};
+
   public:
     //! Initialize a TCPSender
     TCPSender(const size_t capacity = TCPConfig::DEFAULT_CAPACITY,
