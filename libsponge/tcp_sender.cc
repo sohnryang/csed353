@@ -65,33 +65,38 @@ size_t TCPSender::bytes_in_flight() const {
 }
 
 void TCPSender::fill_window() {
-    while (_next_seqno == 0 || !_stream.buffer_empty()) {
-        const auto syn = _next_seqno == 0;
-        const auto read_size =
-            min(_stream.buffer_size(), static_cast<size_t>(max(_window_size, uint16_t{1})) - (syn ? 1 : 0));
-        auto payload = _stream.read(read_size);
+    if (_stream.buffer_empty() && _next_seqno != 0)
+        return;
 
-        TCPSegment segment;
-        segment.payload() = std::move(payload);
-        segment.header().syn = syn;
-        segment.header().seqno = _isn + _next_seqno;
+    const auto syn = _next_seqno == 0;
+    const auto normalized_window_size = static_cast<size_t>(max(_window_size, uint16_t{1}));
+    if (normalized_window_size <= bytes_in_flight())
+        return;
+    const auto available_window_size = normalized_window_size - bytes_in_flight();
 
-        if (!_stream.eof()) {
-            push_segment(segment);
-            continue;
-        }
+    const auto read_size = min(_stream.buffer_size(), available_window_size - (syn ? 1 : 0));
+    auto payload = _stream.read(read_size);
 
-        if (segment.length_in_sequence_space() < _window_size) {
-            segment.header().fin = true;
-            push_segment(segment);
-        } else {
-            push_segment(segment);
+    TCPSegment segment;
+    segment.payload() = std::move(payload);
+    segment.header().syn = syn;
+    segment.header().seqno = _isn + _next_seqno;
 
-            TCPSegment fin_segment;
-            fin_segment.header().fin = true;
-            fin_segment.header().seqno = _isn + _next_seqno;
-            push_segment(fin_segment);
-        }
+    if (!_stream.eof()) {
+        push_segment(segment);
+        return;
+    }
+
+    if (segment.length_in_sequence_space() < _window_size) {
+        segment.header().fin = true;
+        push_segment(segment);
+    } else {
+        push_segment(segment);
+
+        TCPSegment fin_segment;
+        fin_segment.header().fin = true;
+        fin_segment.header().seqno = _isn + _next_seqno;
+        push_segment(fin_segment);
     }
 }
 
