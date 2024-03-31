@@ -22,6 +22,22 @@ void DUMMY_CODE(Targs &&.../* unused */) {}
 
 using namespace std;
 
+RetransmissionTimer::RetransmissionTimer(const uint16_t timeout) : _timeout(timeout) {}
+
+void RetransmissionTimer::tick(const size_t ms_since_last_tick) {
+    if (!_is_running)
+        return;
+    _elapsed += ms_since_last_tick;
+}
+
+bool RetransmissionTimer::is_expired() const { return _elapsed >= _timeout; }
+
+void RetransmissionTimer::start() { _is_running = true; }
+
+void RetransmissionTimer::stop() { _is_running = false; }
+
+void RetransmissionTimer::reset() { _elapsed = 0; }
+
 void TCPSender::push_segment(const TCPSegment &segment) {
     _segments_out.push(segment);
 

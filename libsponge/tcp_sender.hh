@@ -6,10 +6,37 @@
 #include "tcp_segment.hh"
 #include "wrapping_integers.hh"
 
+#include <cstddef>
 #include <functional>
 #include <list>
 #include <optional>
 #include <queue>
+
+class RetransmissionTimer {
+  private:
+    size_t _timeout;
+    size_t _elapsed{0};
+    bool _is_running{false};
+
+  public:
+    RetransmissionTimer(const uint16_t timeout);
+
+    size_t &timeout() { return _timeout; }
+
+    const size_t &timeout() const { return _timeout; }
+
+    void tick(const size_t ms_since_last_tick);
+
+    bool is_expired() const;
+
+    void start();
+
+    void stop();
+
+    bool is_running() const { return _is_running; }
+
+    void reset();
+};
 
 //! \brief The "sender" part of a TCP implementation.
 
