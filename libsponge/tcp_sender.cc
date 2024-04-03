@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
 #include <iterator>
 #include <list>
 #include <numeric>
@@ -14,7 +13,6 @@
 #include <random>
 #include <stdexcept>
 #include <utility>
-#include <vector>
 
 // Dummy implementation of a TCP sender
 

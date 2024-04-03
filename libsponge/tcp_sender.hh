@@ -7,11 +7,9 @@
 #include "wrapping_integers.hh"
 
 #include <cstddef>
-#include <functional>
 #include <list>
 #include <optional>
 #include <queue>
-#include <vector>
 
 class RetransmissionTimer {
   private:
