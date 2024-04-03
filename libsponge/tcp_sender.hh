@@ -75,9 +75,6 @@ class TCPSender {
     //! push a segment to the queue
     void push_segment(const TCPSegment &segment);
 
-    //! return a vector of splitted segments
-    std::vector<TCPSegment> split_to_fit(const TCPSegment &segment);
-
     //! retransmission counter
     unsigned int _retransmission_count{0};
 

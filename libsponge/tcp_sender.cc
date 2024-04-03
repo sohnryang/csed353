@@ -54,15 +54,6 @@ void TCPSender::push_segment(const TCPSegment &segment) {
     }
 }
 
-vector<TCPSegment> TCPSender::split_to_fit(const TCPSegment &segment) {
-    const auto normalized_window_size = max(_window_size, uint16_t{1});
-
-    // TODO: replace with proper implementation
-    if (segment.length_in_sequence_space() > normalized_window_size)
-        throw runtime_error("Not implemented yet");
-    return {segment};
-}
-
 //! \param[in] capacity the capacity of the outgoing byte stream
 //! \param[in] retx_timeout the initial amount of time to wait before retransmitting the oldest outstanding segment
 //! \param[in] fixed_isn the Initial Sequence Number to use, if set (otherwise uses a random ISN)
@@ -157,11 +148,7 @@ void TCPSender::tick(const size_t ms_since_last_tick) {
         const auto it = min_element(_outstanding_segments.cbegin(),
                                     _outstanding_segments.cend(),
                                     [](const auto &p1, const auto &p2) { return p1.first < p2.first; });
-
-        const auto splitted_segments = split_to_fit(it->second);
-
-        for (auto &segment : splitted_segments)
-            _segments_out.emplace(std::move(segment));
+        _segments_out.push(it->second);
 
         if (_window_size != 0) {
             _timer.timeout() *= 2;
