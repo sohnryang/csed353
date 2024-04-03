@@ -73,22 +73,14 @@ void TCPSender::fill_window() {
         if (_stream.eof() && _fin_sent)
             return;
 
-        const auto syn = _next_seqno == 0;
         const auto normalized_window_size = static_cast<size_t>(max(_window_size, uint16_t{1}));
         if (normalized_window_size <= bytes_in_flight())
             return;
-
         const auto available_window_size = normalized_window_size - bytes_in_flight();
-        if (available_window_size == 0)
-            return;
 
         TCPSegment segment;
         segment.header().seqno = _isn + _next_seqno;
-        segment.header().syn = syn;
-        if (segment.length_in_sequence_space() == available_window_size) {
-            push_segment(segment);
-            return;
-        }
+        segment.header().syn = _next_seqno == 0;
 
         const auto read_size = min({_stream.buffer_size(),
                                     available_window_size - segment.length_in_sequence_space(),
