@@ -13,7 +13,7 @@ class ByteStream {
   private:
     bool _error{};              //!< Flag indicating that the stream suffered an error.
     bool _input_eof;            //!< Flag indicating that the input reached the end.
-    const size_t _capacity;     //!< Field for buffer capacity.
+    size_t _capacity;           //!< Field for buffer capacity.
     size_t _buffer_used;        //!< Field for current buffer size.
     size_t _cur;                //!< Field for current buffer position.
     std::vector<char> _buffer;  //!< Underlying vector for buffer.
