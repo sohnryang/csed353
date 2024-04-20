@@ -51,8 +51,10 @@ void TCPConnection::segment_received(const TCPSegment &seg) { DUMMY_CODE(seg); }
 bool TCPConnection::active() const { return {}; }
 
 size_t TCPConnection::write(const string &data) {
-    DUMMY_CODE(data);
-    return {};
+    const auto written = _sender.stream_in().write(data);
+    _sender.fill_window();
+    send_all_segments();
+    return written;
 }
 
 //! \param[in] ms_since_last_tick number of milliseconds since the last call to this method
@@ -60,7 +62,10 @@ void TCPConnection::tick(const size_t ms_since_last_tick) { DUMMY_CODE(ms_since_
 
 void TCPConnection::end_input_stream() {}
 
-void TCPConnection::connect() {}
+void TCPConnection::connect() {
+    _sender.fill_window();
+    send_all_segments();
+}
 
 TCPConnection::~TCPConnection() {
     try {
