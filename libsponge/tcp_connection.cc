@@ -68,8 +68,13 @@ size_t TCPConnection::unassembled_bytes() const { return _receiver.unassembled_b
 size_t TCPConnection::time_since_last_segment_received() const { return _connection_age - _last_segment_received; }
 
 void TCPConnection::segment_received(const TCPSegment &seg) {
-    if (seg.header().rst)
+    if (!_receiver.ackno().has_value() && _sender.next_seqno_absolute() == 0 && !seg.header().syn)
+        return;
+    if (seg.header().rst) {
+        if (!_receiver.ackno().has_value() && _sender.next_seqno_absolute() == 0)
+            return;
         kill_connection();
+    }
     _receiver.segment_received(seg);
     _last_segment_received = _connection_age;
     if (_receiver.stream_out().eof() && !_sender.stream_in().eof())
@@ -77,15 +82,19 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
     if (seg.header().ack)
         _sender.ack_received(seg.header().ackno, seg.header().win);
 
-    if (seg.header().syn)
+    if (_sender.next_seqno_absolute() == 0) {
         _sender.fill_window();
-    else if (seg.length_in_sequence_space() > 0 ||
-             (_receiver.ackno().has_value() && seg.header().seqno == _receiver.ackno().value() - 1))
-        _sender.send_empty_segment();
-    else
+        send_segment();
         return;
-
-    send_segment();
+    } else if (seg.length_in_sequence_space() > 0 ||
+               (_receiver.ackno().has_value() && seg.header().seqno == _receiver.ackno().value() - 1)) {
+        _sender.send_empty_segment();
+        send_segment();
+        return;
+    } else if (_sender.bytes_in_flight() == 0) {
+        _sender.fill_window();
+        send_all_segments();
+    }
 }
 
 bool TCPConnection::active() const {
