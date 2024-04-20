@@ -37,11 +37,6 @@ void TCPConnection::send_segment() {
 }
 
 void TCPConnection::send_all_segments() {
-    if (_sender.consecutive_retransmissions() > TCPConfig::MAX_RETX_ATTEMPTS) {
-        send_rst();
-        kill_connection();
-    }
-
     while (!_sender.segments_out().empty())
         send_segment();
 }
@@ -118,6 +113,13 @@ size_t TCPConnection::write(const string &data) {
 void TCPConnection::tick(const size_t ms_since_last_tick) {
     _connection_age += ms_since_last_tick;
     _sender.tick(ms_since_last_tick);
+
+    if (_sender.consecutive_retransmissions() > TCPConfig::MAX_RETX_ATTEMPTS) {
+        send_rst();
+        kill_connection();
+        return;
+    }
+
     send_all_segments();
 }
 
