@@ -27,9 +27,15 @@ class TCPConnection {
 
     std::size_t _last_segment_received{0};
 
+    bool _killed{false};
+
     void send_segment();
 
     void send_all_segments();
+
+    void send_rst();
+
+    void kill_connection();
 
   public:
     //! \name "Input" interface for the writer
