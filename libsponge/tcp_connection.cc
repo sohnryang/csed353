@@ -44,13 +44,14 @@ size_t TCPConnection::bytes_in_flight() const { return _sender.bytes_in_flight()
 
 size_t TCPConnection::unassembled_bytes() const { return _receiver.unassembled_bytes(); }
 
-size_t TCPConnection::time_since_last_segment_received() const { return {}; }
+size_t TCPConnection::time_since_last_segment_received() const { return _connection_age - _last_segment_received; }
 
 void TCPConnection::segment_received(const TCPSegment &seg) {
     if (seg.header().rst) {
         // TODO: handle RST
     }
     _receiver.segment_received(seg);
+    _last_segment_received = _connection_age;
     if (_receiver.stream_out().eof() && !_sender.stream_in().eof())
         _linger_after_streams_finish = false;
     if (seg.header().ack)
@@ -67,7 +68,7 @@ bool TCPConnection::active() const {
         return true;
     if (!_linger_after_streams_finish)
         return false;
-    return true;  // TODO: implement timeout
+    return _connection_age - _last_segment_received < 10 * _cfg.rt_timeout;
 }
 
 size_t TCPConnection::write(const string &data) {
@@ -79,6 +80,7 @@ size_t TCPConnection::write(const string &data) {
 
 //! \param[in] ms_since_last_tick number of milliseconds since the last call to this method
 void TCPConnection::tick(const size_t ms_since_last_tick) {
+    _connection_age += ms_since_last_tick;
     _sender.tick(ms_since_last_tick);
     send_all_segments();
 }
