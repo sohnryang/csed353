@@ -36,6 +36,7 @@ string ByteStream::peek_output(const size_t len) const {
     if (len > _buffer_used)
         throw std::length_error("Tried to read more than capacity");
     std::string result;
+    result.reserve(len);
     for (size_t i = 0; i < len; i++)
         result.push_back(_buffer[(_cur + i) % _capacity]);
     return result;
