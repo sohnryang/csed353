@@ -14,9 +14,6 @@
 // For Lab 4, please replace with a real implementation that passes the
 // automated checks run by `make check`.
 
-template <typename... Targs>
-void DUMMY_CODE(Targs &&.../* unused */) {}
-
 using namespace std;
 
 void TCPConnection::send_segment() {
