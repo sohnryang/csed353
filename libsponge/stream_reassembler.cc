@@ -46,14 +46,16 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
 
     if (_buffer[_cur].has_value()) {
         string assembled_prefix;
-        assembled_prefix.reserve(_buffer_used);
-        for (size_t i = 0; i < _buffer_used; i++) {
+        assembled_prefix.assign(_buffer_used, 0);
+        size_t i;
+        for (i = 0; i < _buffer_used; i++) {
             auto &ch = _buffer[(_cur + i) % _capacity];
             if (!ch.has_value())
                 break;
-            assembled_prefix += ch.value();
+            assembled_prefix[i] = ch.value();
             ch.reset();
         }
+        assembled_prefix.resize(min(i, _buffer_used));
         _unassembled_start += assembled_prefix.length();
         _cur = (_cur + assembled_prefix.length()) % _capacity;
         _buffer_used -= assembled_prefix.length();
