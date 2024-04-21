@@ -5,8 +5,10 @@
 #include "tcp_receiver.hh"
 #include "tcp_sender.hh"
 #include "tcp_state.hh"
+#include "wrapping_integers.hh"
 
 #include <cstddef>
+#include <optional>
 
 //! \brief A complete endpoint of a TCP connection
 class TCPConnection {
@@ -28,6 +30,8 @@ class TCPConnection {
     std::size_t _last_segment_received{0};
 
     bool _killed{false};
+
+    std::optional<WrappingInt32> _current_ackno{};
 
     void send_segment();
 

@@ -30,7 +30,9 @@ void TCPConnection::send_segment() {
     segment.header().win = min(_receiver.window_size(), static_cast<size_t>(numeric_limits<uint16_t>::max()));
     if (_receiver.ackno().has_value()) {
         segment.header().ack = true;
-        segment.header().ackno = _receiver.ackno().value();
+        if (!_current_ackno.has_value() || _segments_out.empty())
+            _current_ackno = _receiver.ackno().value();
+        segment.header().ackno = _current_ackno.value();
     } else
         segment.header().ack = false;
     _segments_out.push(segment);
