@@ -46,6 +46,7 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
 
     if (_buffer[_cur].has_value()) {
         string assembled_prefix;
+        assembled_prefix.reserve(_buffer_used);
         for (size_t i = 0; i < _buffer_used; i++) {
             auto &ch = _buffer[(_cur + i) % _capacity];
             if (!ch.has_value())
