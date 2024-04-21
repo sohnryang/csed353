@@ -70,7 +70,8 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
             return;
         kill_connection();
     }
-    _receiver.segment_received(seg);
+    if (seg.length_in_sequence_space() > 0)
+        _receiver.segment_received(seg);
     _last_segment_received = _connection_age;
     if (_receiver.stream_out().eof() && !_sender.stream_in().eof())
         _linger_after_streams_finish = false;
