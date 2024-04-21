@@ -84,15 +84,14 @@ void TCPConnection::segment_received(const TCPSegment &seg) {
         _sender.fill_window();
         send_segment();
         return;
-    } else if (seg.length_in_sequence_space() > 0 ||
-               (_receiver.ackno().has_value() && seg.header().seqno == _receiver.ackno().value() - 1)) {
-        _sender.send_empty_segment();
-        send_segment();
-        return;
-    } else if (_sender.bytes_in_flight() == 0) {
-        _sender.fill_window();
-        send_all_segments();
     }
+
+    if (seg.length_in_sequence_space() > 0 ||
+        (_receiver.ackno().has_value() && seg.header().seqno == _receiver.ackno().value() - 1))
+        _sender.send_empty_segment();
+
+    _sender.fill_window();
+    send_all_segments();
 }
 
 bool TCPConnection::active() const {
