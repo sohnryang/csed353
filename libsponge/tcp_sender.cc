@@ -104,13 +104,8 @@ void TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_si
     if (absolute_ackno > _next_seqno)
         return;
 
-    std::list<std::pair<uint64_t, TCPSegment>> new_outstanding;
-    std::copy_if(
-        _outstanding_segments.cbegin(),
-        _outstanding_segments.cend(),
-        std::back_inserter(new_outstanding),
-        [absolute_ackno](const auto &p) { return p.first + p.second.length_in_sequence_space() > absolute_ackno; });
-    _outstanding_segments = std::move(new_outstanding);
+    _outstanding_segments.remove_if(
+        [absolute_ackno](const auto &p) { return p.first + p.second.length_in_sequence_space() <= absolute_ackno; });
 
     if (_outstanding_segments.empty())
         _timer.stop();
