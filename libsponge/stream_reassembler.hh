@@ -4,8 +4,8 @@
 #include "byte_stream.hh"
 
 #include <cstdint>
-#include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 //! \brief A class that assembles a series of excerpts from a byte stream (possibly out of order,
@@ -14,14 +14,14 @@ class StreamReassembler {
   private:
     // Your code here -- add private members as necessary.
 
-    ByteStream _output;                        //!< The reassembled in-order byte stream
-    size_t _capacity;                          //!< The maximum number of bytes
-    size_t _unassembled_start;                 //!< Starting index of unassembled fragments
-    size_t _cur;                               //!< Current position of reassembly buffer
-    size_t _buffer_used;                       //!< Size of reassembly buffer currently in use
-    std::vector<std::optional<char>> _buffer;  //!< Buffer for reassembly
-    bool _is_finalizing;                       //!< Flag indicating that the reassembler is in finalization phase
-    size_t _stream_length;                     //!< Total length of the stream
+    ByteStream _output;                          //!< The reassembled in-order byte stream
+    size_t _capacity;                            //!< The maximum number of bytes
+    size_t _unassembled_start;                   //!< Starting index of unassembled fragments
+    size_t _cur;                                 //!< Current position of reassembly buffer
+    size_t _buffer_used;                         //!< Size of reassembly buffer currently in use
+    std::vector<std::pair<bool, char>> _buffer;  //!< Buffer for reassembly
+    bool _is_finalizing;                         //!< Flag indicating that the reassembler is in finalization phase
+    size_t _stream_length;                       //!< Total length of the stream
 
     //! \brief Capacity available for `_buffer`, in bytes.
     size_t available_capacity() const;

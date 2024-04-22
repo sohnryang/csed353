@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
-#include <optional>
 
 // Dummy implementation of a stream reassembler.
 
@@ -20,7 +19,7 @@ StreamReassembler::StreamReassembler(const size_t capacity)
     , _unassembled_start(0)
     , _cur(0)
     , _buffer_used(0)
-    , _buffer(capacity, std::nullopt)
+    , _buffer(capacity, {false, 0})
     , _is_finalizing(false)
     , _stream_length(0) {}
 
@@ -36,24 +35,24 @@ void StreamReassembler::push_substring(const string &data, const uint64_t index,
     for (size_t stream_index = stream_copy_start; stream_index < stream_copy_end; stream_index++) {
         const size_t unassembled_index = stream_index - _unassembled_start;
         const size_t buffer_index = (unassembled_index + _cur) % _capacity;
-        if (_buffer[buffer_index].has_value())
+        if (_buffer[buffer_index].first)
             continue;
 
-        _buffer[buffer_index] = data[stream_index - index];
+        _buffer[buffer_index] = {true, data[stream_index - index]};
     }
     if (stream_copy_end >= _unassembled_start)
         _buffer_used = max(stream_copy_end - _unassembled_start, _buffer_used);
 
-    if (_buffer[_cur].has_value()) {
+    if (_buffer[_cur].first) {
         string assembled_prefix;
         assembled_prefix.assign(_buffer_used, 0);
         size_t i;
         for (i = 0; i < _buffer_used; i++) {
             auto &ch = _buffer[(_cur + i) % _capacity];
-            if (!ch.has_value())
+            if (!ch.first)
                 break;
-            assembled_prefix[i] = *ch;
-            ch.reset();
+            assembled_prefix[i] = ch.second;
+            ch.first = false;
         }
         assembled_prefix.resize(i);
         _unassembled_start += assembled_prefix.length();
@@ -75,7 +74,7 @@ size_t StreamReassembler::unassembled_bytes() const {
     size_t result = 0;
     for (size_t i = 0; i < _buffer_used; i++) {
         const auto &ch = _buffer[(_cur + i) % _capacity];
-        if (ch.has_value())
+        if (ch.first)
             result++;
     }
     return result;
