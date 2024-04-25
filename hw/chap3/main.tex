@@ -1,0 +1,331 @@
+\documentclass{scrartcl}
+\usepackage[margin=3cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{blindtext}
+\usepackage{datetime}
+\usepackage{fontspec}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{kotex}
+\usepackage[lighttt]{lmodern}
+\usepackage{listings}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{pgf,tikz,pgfplots}
+\usepackage{tabularx}
+
+\pgfplotsset{compat=1.15}
+\usetikzlibrary{arrows}
+\newtheorem{theorem}{Theorem}
+
+\lstset{
+  numbers=none, frame=single, showspaces=false, showstringspaces=false,
+  showtabs=false, breaklines=true, showlines=true, breakatwhitespace=true,
+  basicstyle=\ttfamily, keywordstyle=\bfseries, basewidth=0.5em
+}
+
+\setmainhangulfont{Noto Serif CJK KR}[
+  UprightFont=* Light, BoldFont=* Bold,
+  Script=Hangul, Language=Korean, AutoFakeSlant,
+]
+\setsanshangulfont{Noto Sans CJK KR}[
+  UprightFont=* DemiLight, BoldFont=* Medium,
+  Script=Hangul, Language=Korean
+]
+\setmathhangulfont{Noto Sans CJK KR}[
+  SizeFeatures={
+    {Size=-6,  Font=* Medium},
+    {Size=6-9, Font=*},
+    {Size=9-,  Font=* DemiLight},
+  },
+  Script=Hangul, Language=Korean
+]
+\title{CSED353: Chap. 3 Exercises (due Apr. 26)}
+\author{손량(20220323)}
+\date{Last compiled on: \today, \currenttime}
+
+\newcommand{\un}[1]{\ensuremath{\ \mathrm{#1}}}
+
+\begin{document}
+\maketitle
+
+\section{Problem \#1}
+
+\subsection{Solution for (a)}
+
+The hexadecimal representation of the header is \texttt{c5e8c351000c5cf8}, and
+\texttt{61626364} for data. We can split the hexadecimal into 16-bit words and
+obtain \texttt{[0xc5e8, 0xc351, 0x000c, 0x5cf8, 0x6162, 0x6364]}. The sum can be
+calculated using the following code:
+
+\begin{lstlisting}[language=Python]
+words = [0xC5E8, 0xC351, 0x000C, 0x5CF8, 0x6162, 0x6364]
+checksum = 0
+for word in words:
+    checksum += word
+    carryover = checksum >> 16
+    checksum = (checksum & 0xFFFF) + carryover
+print(f"checksum: {checksum:04x}")
+\end{lstlisting}
+
+and we obtain \texttt{0xab05}.
+
+\subsection{Solution for (b)}
+
+As the checksum is not \texttt{0xffff}, the packet contains errors.
+
+\subsection{Solution for (c)}
+
+The structure of UDP pseudoheader can be represented as follows:
+
+\begin{figure}[H]
+\centering
+\begin{tabularx}{\textwidth}{ |c| *{4}{X|} }
+\hline
+Octet & 0 & 1 & 2 & 3 \\ \hline
+0 & \multicolumn{4}{l|}{Source IPv4 Address (32 bit)} \\ \hline
+4 & \multicolumn{4}{l|}{Destination IPv4 Address (32 bit)} \\ \hline
+8 & Zeroes (8 bit) & Protocol (8 bit) & \multicolumn{2}{l|}{UDP Length (16 bit)} \\ \hline
+\end{tabularx}
+\end{figure}
+
+\subsection{Solution for (d)}
+
+The hexadecimal part for pseudoheader is \texttt{c0a801078ddf054e0011000c},
+which can be split as \texttt{[0xc0a8, 0x0107, 0x8ddf, 0x054e, 0x0011, 0x000c]}.
+The sum can be calculated using the following code:
+
+\begin{lstlisting}[language=Python]
+words = [
+    0xC0A8,
+    0x0107,
+    0x8DDF,
+    0x054E,
+    0x0011,
+    0x000C,
+    0xC5E8,
+    0xC351,
+    0x000C,
+    0x5CF8,
+    0x6162,
+    0x6364,
+]
+checksum = 0
+for word in words:
+    checksum += word
+    carryover = checksum >> 16
+    checksum = (checksum & 0xFFFF) + carryover
+print(f"checksum: {checksum:04x}")
+\end{lstlisting}
+
+And we obtain \texttt{0xffff}.
+
+\subsection{Solution for (e)}
+
+Taking IPv4 UDP pseudoheader into account, the packet is error-free in
+UDP layer as the checksum is valid. However, there might be errors in other
+layers, such as application layer so we cannot be entirely sure that packet
+is error-free.
+
+\subsection{Solution for (f)}
+
+By using UDP pseudoheader, the UDP checksum mechanism can detect errors outside
+UDP layer, such as incorrect source/destination address and routing errors.
+
+\section{Problem \#2}
+
+Let \(L = 1500 \un{bytes}, R = 10^9 \un{bits/s}, \mathsf{RTT} = 30 \un{ms}\) and
+\(n\) as window size, in number of packets. Then the utilization condition can
+be written as
+
+\begin{align*}
+\frac{nL / R}{\mathsf{RTT} + nL / R} > 0.98
+\end{align*}
+
+Solving this inequality, we obtain \(n > 122500\)\footnote{Of course, we only
+consider positive values of \(n\).} so the window size should be bigger than
+122500 bits to have utilization greater than 98 percent.
+
+\section{Problem \#3}
+
+\subsection{Solution for (a)}
+
+As written in the problem statement, the initial sequence number at \(t = 1\)
+is 111.
+
+\subsection{Solution for (b)}
+
+Since the segment sent at \(t = 1\) is the initial segment, the segment has
+SYN flag set and contains payload of size 926 bytes. So the segment's length in
+sequence space is 907. Thus, the sequence number of the segment sent at \(t =
+2\) is \(111 + 927 = 1038\).
+
+\subsection{Solution for (c)}
+
+The length of the segment sent in \(t = 2\), in sequence space is 926, as both
+SYN and FIN flag are not set. Thus, the sequence number of the segment sent in
+\(t = 3\) is \(111 + 927 + 926 = 1964\).
+
+\subsection{Solution for (d)}
+
+The length of the segment sent in \(t = 3\), in sequence space is 926, like the
+segment sent in \(t = 2\). Thus, the sequence number of the segment sent in \(t
+= 4\) is \(111 + 927 + 926 + 926 = 2890\).
+
+\subsection{Solution for (e)}
+
+The length of the segment sent in \(t = 4\), in sequence space is 926, like the
+segment sent in \(t = 3\). Thus, the sequence number of the segment sent in \(t
+= 5\) is \(111 + 927 + 926 + 926 + 926 = 3816\).
+
+\subsection{Solution for (f)}
+
+Only segment sent in \(t = 1\) has arrived in \(t = 8\), so ACK number is \(111
++ 927 = 1038\).
+
+\subsection{Solution for (g)}
+
+Segment sent in \(t = 1\) and \(t = 2\) have arrived in \(t = 9\), so ACK number
+is \(111 + 927 + 926 = 1964\).
+
+\subsection{Solution for (h)}
+
+The segment is lost.
+
+\subsection{Solution for (i)}
+
+Since the segment sent in \(t = 2\) is the last in-order segment in \(t = 11\),
+the ACK number is \(111 + 927 + 926 = 1964\).
+
+\subsection{Solution for (j)}
+
+The segment is lost.
+
+\subsection{Solution for (k)}
+
+The segment sent in \(t = 1\) is acknowledged, so the sixth segment is sent in
+order to fill the window, whose sequence number is \(111 + 927 + 926 + 926 + 926
++ 926 = 4742\).
+
+\subsection{Solution for (l)}
+
+The segment sent in \(t = 2\) is yet to be acknowledged, so the sender does not
+send any segment. None.
+
+\subsection{Solution for (m)}
+
+The segment sent in \(t = 2\) is yet to be acknowledged, so the sender does not
+send any segment. None.
+
+\subsection{Solution for (n)}
+
+The segment sent in \(t = 2\) is acknowledged, so the seventh segment is sent in
+order to fill the window, whose sequence number is \(111 + 927 + 926 + 926 + 926
++ 926 + 926 = 5668\).
+
+\subsection{Solution for (o)}
+
+The segment sent in \(t = 3\) is yet to be acknowledged, so the sender does not
+send any segment. None.
+
+\section{Problem \#4}
+
+For convenience, we denote values of \(\mathsf{EstimatedRTT}\),
+\(\mathsf{DevRTT}\) and \(\mathsf{TimeoutInterval}\) after \(n\)-th
+RTT as \(\mathsf{EstimatedRTT}(n)\), \(\mathsf{DevRTT}(n)\) and
+\(\mathsf{TimeoutInterval}\), respectively. Naturally, \(\mathsf{EstimatedRTT}
+(0) = 320\) and \(\mathsf{DevRTT}(0) = 39\). In addition, let \(n\)-th measured
+RTT as \(\mathsf{SampleRTT}(n)\).
+
+\subsection{Solution for (a)}
+
+We can calculate
+\begin{align*}
+\mathsf{EstimatedRTT}(1)
+&= (1 - \alpha) \times \mathsf{EstimatedRTT}(0) + \alpha \times
+\mathsf{SampleRTT}(1) \\
+&= (1 - 0.125) \times 320 + 0.125 \times 390
+= 328.75
+\end{align*}
+
+\subsection{Solution for (b)}
+
+We can calculate
+\begin{align*}
+\mathsf{DevRTT}(1)
+&= (1 - \beta) \times \mathsf{DevRTT}(0) + \beta \times |\mathsf{SampleRTT}(1) -
+\mathsf{EstimatedRTT}(0)| \\
+&= (1 - 0.25) \times 39 + 0.25 \times |390 - 320|
+= 46.75
+\end{align*}
+
+\subsection{Solution for (c)}
+
+We can calculate
+\begin{align*}
+\mathsf{TimeoutInterval}(1)
+= \mathsf{EstimatedRTT}(1) + 4 \times \mathsf{DevRTT}(1)
+= 515.75
+\end{align*}
+
+\subsection{Solution for (d)}
+
+We can calculate
+\begin{align*}
+\mathsf{EstimatedRTT}(2)
+&= (1 - \alpha) \times \mathsf{EstimatedRTT}(1) + \alpha \times
+\mathsf{SampleRTT}(2) \\
+&= (1 - 0.125) \times 328.75 + 0.125 \times 270
+= 321.41
+\end{align*}
+
+\subsection{Solution for (e)}
+
+We can calculate
+\begin{align*}
+\mathsf{DevRTT}(2)
+&= (1 - \beta) \times \mathsf{DevRTT}(1) + \beta \times |\mathsf{SampleRTT}(2) -
+\mathsf{EstimatedRTT}(1)| \\
+&= (1 - 0.25) \times 46.75 + 0.25 \times |270 - 328.75|
+= 49.75
+\end{align*}
+
+\subsection{Solution for (f)}
+
+We can calculate
+\begin{align*}
+\mathsf{TimeoutInterval}(2)
+= \mathsf{EstimatedRTT}(2) + 4 \times \mathsf{DevRTT}(2)
+= 520.41
+\end{align*}
+
+\section{Problem \#5}
+
+\subsection{Solution for (a)}
+
+Since the server does not keep track of SYN segments, the server has to store
+the information elsewhere. SYN cookie utilizes the sequence number as the
+alternative storage.
+
+\subsection{Solution for (b)}
+
+The attacker has to guess the server's initial sequence number, and that
+involves guessing the server's secret number which is hashed alongside other
+data. The attacker won't be able to create connection as long as the server's
+secret number stays secret.
+
+\subsection{Solution for (c)}
+
+If all the data that is hashed alongside the secret value can be controlled by
+the attacker, it is possible for the attacker to create fully open connections.
+Since the server does not keep track of informations about SYN, the attacker
+can simply send ACK segment with appropriate fields (which depends on how
+SYN cookies are constructed in the server), and with sequence number of
+\(\mathsf{CollectedISN + 1}\) and perform SYN flooding attack. The server won't
+be able to determine whether those ACK segments are legitimate, as they have no
+information about SYN segments received in the past.
+
+\end{document}
+% vim: textwidth=79
