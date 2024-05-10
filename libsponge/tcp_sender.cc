@@ -18,9 +18,6 @@
 // For Lab 3, please replace with a real implementation that passes the
 // automated checks run by `make check_lab3`.
 
-template <typename... Targs>
-void DUMMY_CODE(Targs &&.../* unused */) {}
-
 using namespace std;
 
 RetransmissionTimer::RetransmissionTimer(const uint16_t timeout) : _timeout(timeout) {}
